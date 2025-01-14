@@ -28,7 +28,7 @@ For practice, open a document and click on the 🦆 icon in the left ribbon menu
 
 After text-to-speech, the text result will be saved to the cache at the path below
 
-`.obsidian/plugins/obsidian-memodack-plugin/cache`
+`.obsidian/plugins/memodack/cache`
 
 ### Settings
 

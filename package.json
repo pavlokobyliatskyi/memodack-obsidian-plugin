@@ -1,5 +1,5 @@
 {
-  "name": "obsidian-memodack-plugin",
+  "name": "memodack-obsidian-plugin",
   "version": "0.1.0",
   "description": "This plugin will help you to be better in other languages",
   "main": "main.js",
@@ -9,7 +9,7 @@
     "version": "node version-bump.mjs && git add manifest.json versions.json"
   },
   "keywords": [],
-  "author": "",
+  "author": "Pavlo Kobyliatskyi",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^16.11.6",

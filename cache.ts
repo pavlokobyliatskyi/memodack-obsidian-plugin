@@ -2,7 +2,7 @@ import { Vault } from "obsidian";
 
 export class Cache {
   vault: Vault;
-  cacheDirectory = ".obsidian/plugins/obsidian-memodack-plugin/cache";
+  cacheDirectory = ".obsidian/plugins/memodack/cache";
 
   constructor(vault: Vault) {
     this.vault = vault;
