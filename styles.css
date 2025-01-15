@@ -33,6 +33,10 @@
   cursor: pointer;
 }
 
+.blitz__answers button:disabled {
+  cursor: default;
+}
+
 .blitz__answers button:focus-visible {
   box-shadow: var(--input-shadow);
 }

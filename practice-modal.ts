@@ -118,6 +118,9 @@ export class MemodackPracticeModal extends Modal {
     let nextButtonEl: HTMLButtonElement | undefined = undefined;
     let correctOptionEl: HTMLButtonElement | undefined = undefined;
 
+    // TODO: Fix?
+    const answersButtons: HTMLButtonElement[] = [];
+
     blitz.answers.forEach((option, index) => {
       const optionEl = optionsEl.createEl("button");
 
@@ -125,9 +128,15 @@ export class MemodackPracticeModal extends Modal {
         correctOptionEl = optionEl;
       }
 
+      // Add for disabled
+      answersButtons.push(optionEl);
+
       optionEl.setText(option);
       optionEl.addEventListener("click", () => {
-        // this.onOptionClick(id, index);
+        // Disable all answer buttons
+        answersButtons.forEach((item) => {
+          item.disabled = true;
+        });
 
         if (blitz.correctId === index) {
           optionEl.addClass("correct");
