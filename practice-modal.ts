@@ -1,5 +1,5 @@
 import { getRandomNumbers } from "numbers";
-import { Modal, App } from "obsidian";
+import { Modal, App, PluginManifest } from "obsidian";
 import { Player } from "player";
 import { IMemodackSettings } from "setting-tab";
 import { shuffle } from "shuffle";
@@ -16,10 +16,12 @@ export class MemodackPracticeModal extends Modal {
       answers: string[];
     }
   > = new Map();
+  manifest: PluginManifest;
 
-  constructor(app: App, settings: IMemodackSettings) {
+  constructor(app: App, settings: IMemodackSettings, manifest: PluginManifest) {
     super(app);
     this.settings = settings;
+    this.manifest = manifest;
   }
 
   async onOpen() {
@@ -186,7 +188,7 @@ export class MemodackPracticeModal extends Modal {
   }
 
   private async play(source: string, text: string) {
-    const cache = new Cache(this.app.vault);
+    const cache = new Cache(this.app.vault, this.manifest);
     const tts = new Tts();
     const player = new Player(tts, cache);
 

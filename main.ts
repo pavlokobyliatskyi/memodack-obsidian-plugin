@@ -87,7 +87,7 @@ export default class MemodackPlugin extends Plugin {
 
     // Add the icon in the left ribbon.
     this.addRibbonIcon(icon.id, icon.title, () => {
-      new MemodackPracticeModal(this.app, this.settings).open();
+      new MemodackPracticeModal(this.app, this.settings, this.manifest).open();
     });
   }
 
@@ -96,7 +96,7 @@ export default class MemodackPlugin extends Plugin {
   }
 
   private async play(source: string, text: string) {
-    const cache = new Cache(this.app.vault);
+    const cache = new Cache(this.app.vault, this.manifest);
     const tts = new Tts();
     const player = new Player(tts, cache);
 

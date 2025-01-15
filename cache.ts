@@ -1,11 +1,17 @@
-import { Vault } from "obsidian";
+import { PluginManifest, Vault } from "obsidian";
 
 export class Cache {
+  cacheDirectory: string;
   vault: Vault;
-  cacheDirectory = ".obsidian/plugins/memodack/cache";
+  manifest: PluginManifest;
 
-  constructor(vault: Vault) {
+  constructor(vault: Vault, manifest: PluginManifest) {
     this.vault = vault;
+    this.manifest = manifest;
+
+    this.cacheDirectory = this.manifest?.dir
+      ? `${this.manifest.dir}/cache`
+      : `${this.vault.configDir}/plugins/${this.manifest.id}/cache`;
   }
 
   async add(key: string, value: string): Promise<void> {
