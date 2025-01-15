@@ -35,19 +35,47 @@ export default class MemodackPlugin extends Plugin {
 
     // Working when switch to the Reading (Ctrl + E)
     this.registerMarkdownPostProcessor((element) => {
-      // Process all paragraphs
+      // Process all paragraphs within the element
       element.querySelectorAll("p").forEach((paragraph) => {
         const regex = /\(([^|]+)\|[^\\)]+\)/g; // Matches (word|translation)
-        const originalHTML = paragraph.innerHTML;
+        const textContent = paragraph.textContent;
 
-        // Replace matches in the paragraph content
-        const modifiedHTML = originalHTML.replace(regex, (_, word) => {
-          return `<span class="syntax">${word}</span>`;
-        });
+        // Check that textContent is not null
+        if (textContent) {
+          const fragment = document.createDocumentFragment(); // Create a document fragment to hold new elements
+          let lastIndex = 0; // Initialize the last index for tracking text positions
 
-        // Update paragraph content if modified
-        if (modifiedHTML !== originalHTML) {
-          paragraph.innerHTML = modifiedHTML;
+          textContent.replace(regex, (match, word: string, offset: number) => {
+            // Add text before the match
+            if (offset > lastIndex) {
+              const text = textContent.slice(lastIndex, offset); // Get the text before the match
+              const span = createEl("span", { text });
+              fragment.appendChild(span);
+            }
+
+            const syntaxSpan = createEl("span", {
+              text: word,
+              cls: "syntax",
+            });
+            fragment.appendChild(syntaxSpan);
+
+            // Update the last processed character index
+            lastIndex = offset + match.length;
+
+            // Return an empty string for compatibility with `replace`
+            return "";
+          });
+
+          // Add any remaining text after the last match
+          if (lastIndex < textContent.length) {
+            const text = textContent.slice(lastIndex); // Get the remaining text
+            const remainingSpan = createEl("span", { text });
+            fragment.appendChild(remainingSpan);
+          }
+
+          // Replace the paragraph's content with the new fragment
+          paragraph.textContent = ""; // Clear the old content
+          paragraph.appendChild(fragment);
         }
       });
     });
