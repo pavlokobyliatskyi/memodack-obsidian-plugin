@@ -1,11 +1,9 @@
 import { Cache } from "cache";
 import { icon } from "icon";
-import { getPlatform } from "platform";
 import { Player } from "player";
 import { Translation } from "translation";
 import { Tts } from "tts";
-import { addIcon, Editor, Hotkey, Plugin } from "obsidian";
-import { hotkeys } from "hot-keys";
+import { addIcon, Editor, Plugin } from "obsidian";
 import { MemodackPracticeModal } from "practice-modal";
 import {
   IMemodackSettings,
@@ -54,14 +52,12 @@ export default class MemodackPlugin extends Plugin {
       });
     });
 
-    const platform = getPlatform();
-
     this.addSettingTab(new MemodackSettingTab(this.app, this));
 
     this.addCommand({
       id: "translate",
       name: "Translate",
-      hotkeys: hotkeys[platform] as Hotkey[],
+      hotkeys: [{ modifiers: ["Alt"], key: "T" }],
       editorCallback: async (editor: Editor) => {
         const selection = editor.getSelection();
 
