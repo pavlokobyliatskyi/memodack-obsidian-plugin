@@ -1,5 +1,5 @@
 {
-  "name": "memodack-obsidian-plugin",
+  "name": "obsidian-memodack-plugin",
   "version": "0.1.3",
   "description": "This plugin will help you to be better in other languages",
   "main": "main.js",
