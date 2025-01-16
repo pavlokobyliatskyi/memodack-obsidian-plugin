@@ -1,7 +1,7 @@
 {
   "name": "obsidian-memodack-plugin",
   "version": "0.1.3",
-  "description": "This plugin will help you to be better in other languages",
+  "description": "Helps you memorize words or phrases",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
