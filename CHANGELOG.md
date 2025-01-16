@@ -1,3 +1,17 @@
+## 0.1.2 (2025-01-15)
+
+### Fixed
+
+- Cache directory path
+- Removed the use of `innerHTML`
+- Used default hotkeys
+
+## 0.1.1 (2025-01-15)
+
+### Changed
+
+- Renamed
+
 ## 0.1.0 (2025-01-15)
 
 ### Added
