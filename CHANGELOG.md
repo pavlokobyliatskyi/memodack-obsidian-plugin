@@ -5,6 +5,7 @@
 - Cache directory path
 - Removed the use of `innerHTML`
 - Used default hotkeys
+- Disable answers button after selecting an option
 
 ## 0.1.1 (2025-01-15)
 
