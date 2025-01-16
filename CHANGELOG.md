@@ -4,6 +4,10 @@
 
 - Preserve line breaks in Reading mode
 
+### Changed
+
+- Back to repository name of version `0.1.1`.
+
 ## 0.1.2 (2025-01-15)
 
 ### Fixed
