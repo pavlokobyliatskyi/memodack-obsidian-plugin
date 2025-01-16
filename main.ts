@@ -33,7 +33,6 @@ export default class MemodackPlugin extends Plugin {
 
     addIcon(icon.id, icon.svg);
 
-    // Working when switch to the Reading (Ctrl + E)
     this.registerMarkdownPostProcessor((element) => {
       // Process all paragraphs within the element
       element.querySelectorAll("p").forEach((paragraph) => {
@@ -42,36 +41,46 @@ export default class MemodackPlugin extends Plugin {
 
         // Check that textContent is not null
         if (textContent) {
+          const lines = textContent.split("\n"); // Split textContent into lines
           const fragment = document.createDocumentFragment(); // Create a document fragment to hold new elements
-          let lastIndex = 0; // Initialize the last index for tracking text positions
 
-          textContent.replace(regex, (match, word: string, offset: number) => {
-            // Add text before the match
-            if (offset > lastIndex) {
-              const text = textContent.slice(lastIndex, offset); // Get the text before the match
-              const span = createEl("span", { text });
-              fragment.appendChild(span);
+          lines.forEach((line, lineIndex) => {
+            let lastIndex = 0; // Initialize the last index for tracking text positions
+
+            line.replace(regex, (match, word: string, offset: number) => {
+              // Add text before the match
+              if (offset > lastIndex) {
+                const text = line.slice(lastIndex, offset); // Get the text before the match
+                const span = createEl("span", { text });
+                fragment.appendChild(span);
+              }
+
+              const syntaxSpan = createEl("span", {
+                text: word,
+                cls: "syntax",
+              });
+              fragment.appendChild(syntaxSpan);
+
+              // Update the last processed character index
+              lastIndex = offset + match.length;
+
+              // Return an empty string for compatibility with `replace`
+              return "";
+            });
+
+            // Add any remaining text after the last match
+            if (lastIndex < line.length) {
+              const text = line.slice(lastIndex); // Get the remaining text
+              const remainingSpan = createEl("span", { text });
+              fragment.appendChild(remainingSpan);
             }
 
-            const syntaxSpan = createEl("span", {
-              text: word,
-              cls: "syntax",
-            });
-            fragment.appendChild(syntaxSpan);
-
-            // Update the last processed character index
-            lastIndex = offset + match.length;
-
-            // Return an empty string for compatibility with `replace`
-            return "";
+            // Add a line break if it's not the last line
+            if (lineIndex < lines.length - 1) {
+              const br = createEl("br");
+              fragment.appendChild(br);
+            }
           });
-
-          // Add any remaining text after the last match
-          if (lastIndex < textContent.length) {
-            const text = textContent.slice(lastIndex); // Get the remaining text
-            const remainingSpan = createEl("span", { text });
-            fragment.appendChild(remainingSpan);
-          }
 
           // Replace the paragraph's content with the new fragment
           paragraph.textContent = ""; // Clear the old content

@@ -1,3 +1,9 @@
+## 0.1.3 (2025-01-16)
+
+### Fixed
+
+- Preserve line breaks in Reading mode
+
 ## 0.1.2 (2025-01-15)
 
 ### Fixed
