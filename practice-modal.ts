@@ -18,53 +18,23 @@ export class MemodackPracticeModal extends Modal {
   > = new Map();
   manifest: PluginManifest;
 
-  constructor(app: App, settings: IMemodackSettings, manifest: PluginManifest) {
+  words: { word: string; translation: string }[] = [];
+
+  constructor(
+    app: App,
+    settings: IMemodackSettings,
+    manifest: PluginManifest,
+    words: { word: string; translation: string }[]
+  ) {
     super(app);
     this.settings = settings;
     this.manifest = manifest;
+
+    this.words = words;
   }
 
   async onOpen() {
-    const activeFile = this.app.workspace.getActiveFile();
-
-    if (!activeFile) {
-      return;
-    }
-
-    const fileContent = this.app.vault.read(activeFile);
-
-    const words: { value: string; translation: string }[] = [];
-
-    await fileContent.then((content) => {
-      const regex = /\(([^)]+)\)/g; // /\(([^|]+)\|[^\\)]+\)/g
-      const matches = [...content.matchAll(regex)];
-
-      // Generate words array
-      matches.forEach((match) => {
-        const options = match[1].split("|");
-
-        // Don't put duplicates to the array
-        if (words.find((item) => item.value === options[0])) {
-          return;
-        }
-
-        words.push({
-          value: options[0],
-          translation: options[1],
-        });
-      });
-    });
-
-    if (words.length < 4) {
-      const { contentEl } = this;
-
-      const wordEl = contentEl.createEl("h2");
-      wordEl.setText("Minimum 4 words...");
-
-      return;
-    }
-
-    const shuffleWords = shuffle(words);
+    const shuffleWords = shuffle(this.words);
 
     shuffleWords.forEach((word, index) => {
       // Get 3 words except 1 (answers)
@@ -85,7 +55,7 @@ export class MemodackPracticeModal extends Modal {
       );
 
       this.blitzMap.set(index, {
-        question: word.value,
+        question: word.word,
         correctId,
         answers,
       });

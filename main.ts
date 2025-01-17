@@ -3,7 +3,7 @@ import { icon } from "icon";
 import { Player } from "player";
 import { Translation } from "translation";
 import { Tts } from "tts";
-import { addIcon, Editor, Plugin } from "obsidian";
+import { addIcon, Editor, MarkdownView, Notice, Plugin } from "obsidian";
 import { MemodackPracticeModal } from "practice-modal";
 import {
   IMemodackSettings,
@@ -33,6 +33,7 @@ export default class MemodackPlugin extends Plugin {
 
     addIcon(icon.id, icon.svg);
 
+    // Syntax (Reading)
     this.registerMarkdownPostProcessor((element) => {
       // Process all paragraphs within the element
       element.querySelectorAll("p").forEach((paragraph) => {
@@ -55,9 +56,16 @@ export default class MemodackPlugin extends Plugin {
                 fragment.appendChild(span);
               }
 
+              const translationRegex = /\|([^)]+)/; // (word|translation) -> translation
+              const translation = match.match(translationRegex);
+
               const syntaxSpan = createEl("span", {
                 text: word,
                 cls: "syntax",
+                // Add translation to a word
+                attr: {
+                  "data-translation": translation ? translation[1] : "empty", // Temp
+                },
               });
               fragment.appendChild(syntaxSpan);
 
@@ -119,9 +127,105 @@ export default class MemodackPlugin extends Plugin {
     });
 
     // Add the icon in the left ribbon.
-    this.addRibbonIcon(icon.id, icon.title, () => {
-      new MemodackPracticeModal(this.app, this.settings, this.manifest).open();
+    this.addRibbonIcon(icon.id, icon.title, async () => {
+      const words = await this.getWords();
+
+      const isReadingMode =
+        this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode() ===
+        "preview";
+
+      // Temp
+      const selection = this.app.workspace.activeEditor?.editor?.getSelection();
+
+      if (!isReadingMode && selection) {
+        new Notice("Only in Reding Mode!");
+        return;
+      }
+
+      if (!words?.length) {
+        new Notice("No words provided!");
+        return;
+      }
+
+      if (words.length < 4) {
+        new Notice("At least 4 words required!");
+        return;
+      }
+
+      new MemodackPracticeModal(
+        this.app,
+        this.settings,
+        this.manifest,
+        words
+      ).open();
     });
+  }
+
+  // Return ["(word|translation)"]
+  async getWords() {
+    const words: { word: string; translation: string }[] = [];
+
+    const activeFile = this.app.workspace.getActiveFile();
+
+    if (!activeFile) {
+      return;
+    }
+
+    const selection = window.getSelection();
+
+    // Get words from the all file
+    if (!selection || selection.rangeCount === 0) {
+      // Read all file
+      const content = await this.app.vault.read(activeFile);
+
+      const regex = /\(([^)]+)\)/g; // /\(([^|]+)\|[^\\)]+\)/g
+      const matches = [...content.matchAll(regex)];
+
+      // Generate words array
+      matches.forEach((match) => {
+        const [word, translation] = match[1].split("|"); // ['word', "translation"]
+
+        // Don't put duplicates to the array
+        if (words.find((item) => item.word === word)) {
+          return;
+        }
+
+        words.push({
+          word,
+          translation,
+        });
+      });
+
+      return words;
+    }
+
+    // Get words from selection only
+    const ranges = selection.getRangeAt(0);
+    const spans = document.querySelectorAll(".syntax");
+
+    // Iterate over all <span> elements
+    spans.forEach((span) => {
+      const spanRange = document.createRange();
+      spanRange.selectNode(span);
+
+      // Check if the selection intersects with the <span> element
+      if (ranges.intersectsNode(span)) {
+        const word = span.textContent;
+        const translation = span.getAttribute("data-translation");
+
+        // Format the string and add it to the array
+        if (word && translation) {
+          words.push({ word, translation });
+        }
+      }
+
+      // TODO: Check if the <span> element is fully selected (For not Reading Mode)?
+    });
+
+    // Clear selection
+    selection.removeAllRanges();
+
+    return words;
   }
 
   onunload() {
