@@ -102,7 +102,7 @@ export default class MemodackPlugin extends Plugin {
     this.addCommand({
       id: "translate",
       name: "Translate",
-      hotkeys: [{ modifiers: ["Alt"], key: "T" }],
+      hotkeys: [], // Alt+T
       editorCallback: async (editor: Editor) => {
         const selection = editor.getSelection();
 
