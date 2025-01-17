@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Updated the syntax `{value|translation}`
+
 ### Fixed
 
 - Getting words for practice

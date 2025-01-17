@@ -10,6 +10,7 @@ import {
   DEFAULT_MEMODACK_SETTINGS,
   MemodackSettingTab,
 } from "setting-tab";
+import { regexCurly } from "regex";
 
 const translation = new Translation();
 
@@ -37,7 +38,6 @@ export default class MemodackPlugin extends Plugin {
     this.registerMarkdownPostProcessor((element) => {
       // Process all paragraphs within the element
       element.querySelectorAll("p").forEach((paragraph) => {
-        const regex = /\(([^|]+)\|[^\\)]+\)/g; // Matches (word|translation)
         const textContent = paragraph.textContent;
 
         // Check that textContent is not null
@@ -48,33 +48,34 @@ export default class MemodackPlugin extends Plugin {
           lines.forEach((line, lineIndex) => {
             let lastIndex = 0; // Initialize the last index for tracking text positions
 
-            line.replace(regex, (match, word: string, offset: number) => {
-              // Add text before the match
-              if (offset > lastIndex) {
-                const text = line.slice(lastIndex, offset); // Get the text before the match
-                const span = createEl("span", { text });
-                fragment.appendChild(span);
+            line.replace(
+              regexCurly,
+              (match, word: string, translation: string, offset: number) => {
+                // Add text before the match
+                if (offset > lastIndex) {
+                  const text = line.slice(lastIndex, offset); // Get the text before the match
+                  const span = createEl("span", { text });
+                  fragment.appendChild(span);
+                }
+
+                const syntaxSpan = createEl("span", {
+                  text: word,
+                  cls: "syntax",
+                  // Add translation to the word
+                  attr: {
+                    "data-translation": translation,
+                  },
+                });
+
+                fragment.appendChild(syntaxSpan);
+
+                // Update the last processed character index
+                lastIndex = offset + match.length;
+
+                // Return an empty string for compatibility with `replace`
+                return "";
               }
-
-              const translationRegex = /\|([^)]+)/; // (word|translation) -> translation
-              const translation = match.match(translationRegex);
-
-              const syntaxSpan = createEl("span", {
-                text: word,
-                cls: "syntax",
-                // Add translation to a word
-                attr: {
-                  "data-translation": translation ? translation[1] : "empty", // Temp
-                },
-              });
-              fragment.appendChild(syntaxSpan);
-
-              // Update the last processed character index
-              lastIndex = offset + match.length;
-
-              // Return an empty string for compatibility with `replace`
-              return "";
-            });
+            );
 
             // Add any remaining text after the last match
             if (lastIndex < line.length) {
@@ -117,7 +118,7 @@ export default class MemodackPlugin extends Plugin {
           return;
         }
 
-        editor.replaceSelection(`(${selection}|${translate})`);
+        editor.replaceSelection(`{${selection}|${translate}}`);
 
         // TTS (don't wait)
         this.play(this.settings.source, selection).then(() => {
@@ -128,8 +129,6 @@ export default class MemodackPlugin extends Plugin {
 
     // Add the icon in the left ribbon.
     this.addRibbonIcon(icon.id, icon.title, async () => {
-      const words = await this.getWords();
-
       const isReadingMode =
         this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode() ===
         "preview";
@@ -141,6 +140,8 @@ export default class MemodackPlugin extends Plugin {
         new Notice("Only in Reding Mode!");
         return;
       }
+
+      const words = await this.getWords();
 
       if (!words?.length) {
         new Notice("No words provided!");
@@ -209,21 +210,18 @@ export default class MemodackPlugin extends Plugin {
       return [];
     }
 
-    const regex = /\(([^)]+)\)/g; // /\(([^|]+)\|[^\\)]+\)/g
-    const matches = [...content.matchAll(regex)];
+    const matches = [...content.matchAll(regexCurly)];
 
     // Generate words array
     matches.forEach((match) => {
-      const [word, translation] = match[1].split("|"); // ['word', "translation"]
-
       // Don't put duplicates to the array
-      if (words.find((item) => item.word === word)) {
+      if (words.find((item) => item.word === match[1])) {
         return;
       }
 
       words.push({
-        word,
-        translation,
+        word: match[1],
+        translation: match[2],
       });
     });
 
