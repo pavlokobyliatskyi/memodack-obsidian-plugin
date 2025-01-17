@@ -1,3 +1,11 @@
+# Changelog
+
+## [Unreleased]
+
+### Fixed
+
+- Getting words for practice
+
 ## 0.2.0 (2025-01-17)
 
 ### Added
