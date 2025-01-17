@@ -20,9 +20,13 @@ Translation hiding only in Reading
 
 ### Practice
 
-For practice, open a document and click on the 🦆 icon in the left ribbon menu, or search for `Memodack` in the command palette.
+For practice, open a document and click on the 🦆 icon in the left ribbon menu, or search for `Memodack` in the command palette
 
 ![alt text](practice.gif)
+
+If you want to practice all the words in the document, just enable Reading mode and select what you need. If a word is not fully highlighted, it will still be selected!
+
+![alt text](selection.gif)
 
 ### Cache
 
