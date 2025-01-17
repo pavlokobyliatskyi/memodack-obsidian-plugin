@@ -1,3 +1,13 @@
+## 0.2.0 (2025-01-17)
+
+### Added
+
+- Practice by selecting
+
+### Fixed
+
+- Remove default hotkeys
+
 ## 0.1.4 (2025-01-17)
 
 ### Changed
