@@ -161,69 +161,71 @@ export default class MemodackPlugin extends Plugin {
     });
   }
 
-  // Return ["(word|translation)"]
   async getWords() {
-    const words: { word: string; translation: string }[] = [];
-
     const activeFile = this.app.workspace.getActiveFile();
 
     if (!activeFile) {
       return;
     }
 
+    const words: { word: string; translation: string }[] = [];
+
     const selection = window.getSelection();
 
-    // Get words from the all file
-    if (!selection || selection.rangeCount === 0) {
-      // Read all file
-      const content = await this.app.vault.read(activeFile);
+    if (selection && selection.rangeCount > 0 && selection.toString().length) {
+      // Get words from selection only
+      const ranges = selection.getRangeAt(0);
+      const spans = document.querySelectorAll(".syntax");
 
-      const regex = /\(([^)]+)\)/g; // /\(([^|]+)\|[^\\)]+\)/g
-      const matches = [...content.matchAll(regex)];
+      // Iterate over all <span> elements
+      spans.forEach((span) => {
+        const spanRange = document.createRange();
+        spanRange.selectNode(span);
 
-      // Generate words array
-      matches.forEach((match) => {
-        const [word, translation] = match[1].split("|"); // ['word', "translation"]
+        // Check if the selection intersects with the <span> element
+        if (ranges.intersectsNode(span)) {
+          const word = span.textContent;
+          const translation = span.getAttribute("data-translation");
 
-        // Don't put duplicates to the array
-        if (words.find((item) => item.word === word)) {
-          return;
+          // Format the string and add it to the array
+          if (word && translation) {
+            words.push({ word, translation });
+          }
         }
 
-        words.push({
-          word,
-          translation,
-        });
+        // TODO: Check if the <span> element is fully selected (For not Reading Mode)?
       });
+
+      // Clear selection
+      selection.removeAllRanges();
 
       return words;
     }
 
-    // Get words from selection only
-    const ranges = selection.getRangeAt(0);
-    const spans = document.querySelectorAll(".syntax");
+    // Get words from the all file
+    const content = await this.app.vault.read(activeFile);
 
-    // Iterate over all <span> elements
-    spans.forEach((span) => {
-      const spanRange = document.createRange();
-      spanRange.selectNode(span);
+    if (!content.length) {
+      return [];
+    }
 
-      // Check if the selection intersects with the <span> element
-      if (ranges.intersectsNode(span)) {
-        const word = span.textContent;
-        const translation = span.getAttribute("data-translation");
+    const regex = /\(([^)]+)\)/g; // /\(([^|]+)\|[^\\)]+\)/g
+    const matches = [...content.matchAll(regex)];
 
-        // Format the string and add it to the array
-        if (word && translation) {
-          words.push({ word, translation });
-        }
+    // Generate words array
+    matches.forEach((match) => {
+      const [word, translation] = match[1].split("|"); // ['word', "translation"]
+
+      // Don't put duplicates to the array
+      if (words.find((item) => item.word === word)) {
+        return;
       }
 
-      // TODO: Check if the <span> element is fully selected (For not Reading Mode)?
+      words.push({
+        word,
+        translation,
+      });
     });
-
-    // Clear selection
-    selection.removeAllRanges();
 
     return words;
   }
