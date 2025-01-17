@@ -8,13 +8,13 @@
 
 ### Description
 
-This plugin will help you to be better in other languages. For a better understanding, watch a [demo](https://youtu.be/XK10tU6j4Vo)
+This plugin will help you to be better in other languages
 
 ### Syntax
 
 Translation hiding only in Reading
 
-`(word|translation)`
+`{value|translation}`
 
 ![alt text](syntax.gif)
 
@@ -40,9 +40,9 @@ In the settings, you can select `Source` and `Target` languages
 
 ![alt text](settings.png)
 
-### Hot Keys
+### Hotkeys
 
-For a quick translation and to convert a word to plugin syntax, select the text and press `Alt+T` or `Option+T`
+For a quick translation and to convert a word to plugin syntax, find the command `Memodack: Translate` and set a hotkey, for example, `Alt+T`.
 
 ![alt text](translate.gif)
 
