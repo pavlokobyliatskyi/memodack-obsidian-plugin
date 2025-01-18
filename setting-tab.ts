@@ -2,12 +2,12 @@ import { languages } from "languages";
 import MemodackPlugin from "main";
 import { PluginSettingTab, App, Setting } from "obsidian";
 
-export interface IMemodackSettings {
+export interface ISettings {
   source: string;
   target: string;
 }
 
-export const DEFAULT_MEMODACK_SETTINGS: Partial<IMemodackSettings> = {
+export const DEFAULT_SETTINGS: Partial<ISettings> = {
   source: "en",
   target: "uk",
 };

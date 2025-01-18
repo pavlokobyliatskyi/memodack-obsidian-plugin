@@ -5,24 +5,15 @@ import { Translation } from "translation";
 import { Tts } from "tts";
 import { addIcon, Editor, MarkdownView, Notice, Plugin } from "obsidian";
 import { MemodackPracticeModal } from "practice-modal";
-import {
-  IMemodackSettings,
-  DEFAULT_MEMODACK_SETTINGS,
-  MemodackSettingTab,
-} from "setting-tab";
-import { regexCurly } from "regex";
+import { ISettings, DEFAULT_SETTINGS, MemodackSettingTab } from "setting-tab";
 
 const translation = new Translation();
 
 export default class MemodackPlugin extends Plugin {
-  settings: IMemodackSettings;
+  settings: ISettings;
 
   async loadSettings() {
-    this.settings = Object.assign(
-      {},
-      DEFAULT_MEMODACK_SETTINGS,
-      await this.loadData()
-    );
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
   }
 
   async saveSettings() {
@@ -36,65 +27,55 @@ export default class MemodackPlugin extends Plugin {
 
     // Syntax (Reading)
     this.registerMarkdownPostProcessor((element) => {
-      // Process all paragraphs within the element
-      element.querySelectorAll("p").forEach((paragraph) => {
-        const textContent = paragraph.textContent;
+      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
 
-        // Check that textContent is not null
-        if (textContent) {
-          const lines = textContent.split("\n"); // Split textContent into lines
-          const fragment = document.createDocumentFragment(); // Create a document fragment to hold new elements
+      const nodesToReplace = [];
+      let node;
 
-          lines.forEach((line, lineIndex) => {
-            let lastIndex = 0; // Initialize the last index for tracking text positions
-
-            line.replace(
-              regexCurly,
-              (match, word: string, translation: string, offset: number) => {
-                // Add text before the match
-                if (offset > lastIndex) {
-                  const text = line.slice(lastIndex, offset); // Get the text before the match
-                  const span = createEl("span", { text });
-                  fragment.appendChild(span);
-                }
-
-                const syntaxSpan = createEl("span", {
-                  text: word,
-                  cls: "syntax",
-                  // Add translation to the word
-                  attr: {
-                    "data-translation": translation,
-                  },
-                });
-
-                fragment.appendChild(syntaxSpan);
-
-                // Update the last processed character index
-                lastIndex = offset + match.length;
-
-                // Return an empty string for compatibility with `replace`
-                return "";
-              }
-            );
-
-            // Add any remaining text after the last match
-            if (lastIndex < line.length) {
-              const text = line.slice(lastIndex); // Get the remaining text
-              const remainingSpan = createEl("span", { text });
-              fragment.appendChild(remainingSpan);
-            }
-
-            // Add a line break if it's not the last line
-            if (lineIndex < lines.length - 1) {
-              const br = createEl("br");
-              fragment.appendChild(br);
-            }
-          });
-
-          // Replace the paragraph's content with the new fragment
-          paragraph.textContent = ""; // Clear the old content
-          paragraph.appendChild(fragment);
+      while ((node = walker.nextNode())) {
+        if (node?.nodeValue && node.nodeValue.match(/\{.*?\|.*?\}/)) {
+          nodesToReplace.push(node);
         }
+      }
+
+      if (!nodesToReplace.length) {
+        return;
+      }
+
+      nodesToReplace.forEach((node) => {
+        if (!node?.nodeValue) {
+          return;
+        }
+
+        const fragment = document.createDocumentFragment();
+
+        const parts = node.nodeValue.split(/(\{.*?\|.*?\})/);
+
+        parts.forEach((part) => {
+          const match = part.match(/\{(.*?)\|(.*?)\}/);
+
+          if (match) {
+            const span = createEl("span", {
+              cls: "syntax",
+              text: match[1],
+              // Add translation
+              attr: {
+                "data-translation": match[2],
+              },
+            });
+
+            // TODO: Play on click
+            fragment.appendChild(span);
+          } else {
+            fragment.appendChild(document.createTextNode(part));
+          }
+        });
+
+        if (!node.parentNode) {
+          return;
+        }
+
+        node.parentNode.replaceChild(fragment, node);
       });
     });
 
@@ -193,8 +174,6 @@ export default class MemodackPlugin extends Plugin {
             words.push({ word, translation });
           }
         }
-
-        // TODO: Check if the <span> element is fully selected (For not Reading Mode)?
       });
 
       // Clear selection
@@ -210,7 +189,7 @@ export default class MemodackPlugin extends Plugin {
       return [];
     }
 
-    const matches = [...content.matchAll(regexCurly)];
+    const matches = [...content.matchAll(/\{([^\\|{}]+)\|([^\\|{}]+)\}/g)]; // {value|translation}
 
     // Generate words array
     matches.forEach((match) => {

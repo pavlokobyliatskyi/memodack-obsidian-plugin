@@ -1,13 +1,13 @@
 import { getRandomNumbers } from "numbers";
 import { Modal, App, PluginManifest } from "obsidian";
 import { Player } from "player";
-import { IMemodackSettings } from "setting-tab";
+import { ISettings } from "setting-tab";
 import { shuffle } from "shuffle";
 import { Tts } from "tts";
 import { Cache } from "cache";
 
 export class MemodackPracticeModal extends Modal {
-  settings: IMemodackSettings;
+  settings: ISettings;
   private blitzMap: Map<
     number,
     {
@@ -22,7 +22,7 @@ export class MemodackPracticeModal extends Modal {
 
   constructor(
     app: App,
-    settings: IMemodackSettings,
+    settings: ISettings,
     manifest: PluginManifest,
     words: { word: string; translation: string }[]
   ) {
