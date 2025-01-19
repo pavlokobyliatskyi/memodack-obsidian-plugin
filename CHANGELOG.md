@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+
+- Connection check for the server
+
 ## 1.1.0 (2025-01-19)
 
 ### Added

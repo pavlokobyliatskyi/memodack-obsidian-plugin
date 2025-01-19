@@ -1,6 +1,7 @@
 import { languages } from "languages";
 import MemodackPlugin from "main";
-import { PluginSettingTab, App, Setting } from "obsidian";
+import { PluginSettingTab, App, Setting, Notice } from "obsidian";
+import { Ping } from "ping";
 import { TServer } from "types";
 
 export interface ISettings {
@@ -30,9 +31,11 @@ export class MemodackSettingTab extends PluginSettingTab {
 
     containerEl.empty();
 
+    containerEl.createEl("h2", { text: "Server" });
+
     new Setting(containerEl)
-      .setName("Server")
-      .setDesc("Get translation or audio url ")
+      .setName("Type")
+      .setDesc("Choose the server type")
       .addDropdown((dropdown) => {
         dropdown
           .addOptions({
@@ -49,10 +52,11 @@ export class MemodackSettingTab extends PluginSettingTab {
           });
       });
 
+    // Personal
     if (this.plugin.settings.server === "personal") {
       new Setting(containerEl)
-        .setName("Server URL")
-        .setDesc("This is a server URL")
+        .setName("URL")
+        .setDesc("This is the URL of the server API")
         .addText((text) =>
           text
             .setPlaceholder(
@@ -66,11 +70,11 @@ export class MemodackSettingTab extends PluginSettingTab {
         );
 
       new Setting(containerEl)
-        .setName("Server X API Key")
-        .setDesc("This is credential for access to server")
+        .setName("X API Key")
+        .setDesc("This credential grants access to the server")
         .addText((text) =>
           text
-            .setPlaceholder("from the lambda function")
+            .setPlaceholder("x-api-key found in the server file")
             .setValue(this.plugin.settings?.xApiKey || "")
             .onChange(async (value) => {
               value = value.replace(/\/$/, ""); // remove a trailing slash ("/");
@@ -79,11 +83,25 @@ export class MemodackSettingTab extends PluginSettingTab {
             })
             .inputEl.setAttribute("type", "password")
         );
+
+      new Setting(containerEl)
+        .setName("Connection")
+        .setDesc("Verify the connection to the server")
+        .addButton((btn) =>
+          btn
+            .setButtonText("Check")
+            .setCta()
+            .onClick(() => {
+              this.checkConnection();
+            })
+        );
     }
 
+    containerEl.createEl("h2", { text: "Language" });
+
     new Setting(containerEl)
-      .setName("Your Native Language")
-      .setDesc("This is your native language")
+      .setName("Native")
+      .setDesc("This is the language you speak natively")
       .addDropdown((dropdown) => {
         dropdown
           .addOptions(languages)
@@ -95,8 +113,8 @@ export class MemodackSettingTab extends PluginSettingTab {
       });
 
     new Setting(containerEl)
-      .setName("Document Text Language")
-      .setDesc("This is a second language")
+      .setName("Document")
+      .setDesc("This is the language of the document")
       .addDropdown((dropdown) => {
         dropdown
           .addOptions(languages)
@@ -106,5 +124,25 @@ export class MemodackSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
       });
+  }
+
+  // Temp
+  private async checkConnection() {
+    if (
+      this.plugin.settings.server === "personal" &&
+      this.plugin.settings?.url &&
+      this.plugin.settings?.xApiKey
+    ) {
+      const ping = await Ping.ping(
+        this.plugin.settings?.url,
+        this.plugin.settings?.xApiKey
+      );
+
+      if (ping) {
+        new Notice("Success Connection!");
+      } else {
+        new Notice("Failed Connection!");
+      }
+    }
   }
 }

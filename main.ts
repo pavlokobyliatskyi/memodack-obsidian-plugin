@@ -7,6 +7,7 @@ import { ISettings, DEFAULT_SETTINGS, MemodackSettingTab } from "setting-tab";
 import { Free } from "free";
 import { Personal } from "personal";
 import { IServer } from "types";
+import { Ping } from "ping";
 
 export default class MemodackPlugin extends Plugin {
   settings: ISettings;
@@ -22,21 +23,7 @@ export default class MemodackPlugin extends Plugin {
   async onload() {
     await this.loadSettings();
 
-    // Ping
-    // TODO: What about ping every minute!?
-    if (
-      this.settings.server === "personal" &&
-      this.settings?.url &&
-      this.settings?.xApiKey
-    ) {
-      const personal = new Personal(this.settings.url, this.settings.xApiKey);
-      const translation = await personal.getTranslation("en", "uk", "ping");
-
-      if (!translation || translation !== "пінг") {
-        this.settings.server = "free";
-        await this.loadSettings();
-      }
-    }
+    await this.checkConnection();
 
     addIcon(icon.id, icon.svg);
 
@@ -271,5 +258,22 @@ export default class MemodackPlugin extends Plugin {
     const player = new Player(server, cache);
 
     await player.play(source, text);
+  }
+
+  // Temp
+  async checkConnection() {
+    if (
+      this.settings.server === "personal" &&
+      this.settings?.url &&
+      this.settings?.xApiKey
+    ) {
+      const ping = await Ping.ping(this.settings?.url, this.settings?.xApiKey);
+
+      // Switch to Free
+      if (!ping) {
+        this.settings.server = "free";
+        await this.loadSettings();
+      }
+    }
   }
 }
