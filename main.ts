@@ -140,6 +140,10 @@ export default class MemodackPlugin extends Plugin {
 
         // TTS (don't wait)
         this.play(this.settings.source, selection).then(() => {
+          if (!translation) {
+            return;
+          }
+
           this.play(this.settings.target, translation);
         });
       },
