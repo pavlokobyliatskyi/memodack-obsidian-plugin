@@ -19,8 +19,8 @@ Instructions will be provided soon.
 To set up the server locally, follow these steps:
 
 ```bash
-git clone --depth 1 https://github.com/some-username/some-repo
-cd some-repo/server/
+git clone --depth 1 https://github.com/pavlokobyliatskyi/obsidian-memodack-plugin.git
+cd obsidian-memodack-plugin/server/
 ```
 
 Alternatively, you can manually download the `server.py` and `requirements.txt` files.
