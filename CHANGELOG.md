@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.1 (2025-01-19)
+
+### Added
+
+- Added the server and the Lambda function
+
 ## 1.0.1 (2025-01-18)
 
 ### Fixed
