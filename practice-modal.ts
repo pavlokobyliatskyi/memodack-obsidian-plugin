@@ -3,8 +3,10 @@ import { Modal, App, PluginManifest } from "obsidian";
 import { Player } from "player";
 import { ISettings } from "setting-tab";
 import { shuffle } from "shuffle";
-import { Tts } from "tts";
 import { Cache } from "cache";
+import { IServer } from "types";
+import { Personal } from "personal";
+import { Free } from "free";
 
 export class MemodackPracticeModal extends Modal {
   settings: ISettings;
@@ -168,8 +170,21 @@ export class MemodackPracticeModal extends Modal {
 
   private async play(source: string, text: string) {
     const cache = new Cache(this.app.vault, this.manifest);
-    const tts = new Tts();
-    const player = new Player(tts, cache);
+
+    // Temp
+    let server: IServer;
+
+    if (
+      this.settings.server === "personal" &&
+      this.settings?.url &&
+      this.settings?.xApiKey
+    ) {
+      server = new Personal(this.settings.url, this.settings.xApiKey);
+    } else {
+      server = new Free();
+    }
+
+    const player = new Player(server, cache);
 
     await player.play(source, text);
   }

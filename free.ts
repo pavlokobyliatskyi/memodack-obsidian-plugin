@@ -1,3 +1,5 @@
+import { IServer } from "types";
+import translate from "translate";
 import * as googleTtsApi from "google-tts-api";
 import { requestUrl } from "obsidian";
 
@@ -6,11 +8,22 @@ const arrayBufferToBase64 = async (arrayBuffer: ArrayBuffer) => {
   return btoa(binaryString);
 };
 
-export class Tts {
-  async getAudioUrl(language: string, text: string) {
+export class Free implements IServer {
+  async getTranslation(source: string, target: string, text: string) {
+    try {
+      return await translate(text, {
+        from: source,
+        to: target,
+      });
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async getAudioUrl(source: string, text: string) {
     try {
       const audioUrl = await googleTtsApi.getAudioUrl(text, {
-        lang: language,
+        lang: source,
         slow: false,
         host: "https://translate.google.com",
       });

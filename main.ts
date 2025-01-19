@@ -1,13 +1,12 @@
 import { Cache } from "cache";
 import { icon } from "icon";
 import { Player } from "player";
-import { Translation } from "translation";
-import { Tts } from "tts";
 import { addIcon, Editor, MarkdownView, Notice, Plugin } from "obsidian";
 import { MemodackPracticeModal } from "practice-modal";
 import { ISettings, DEFAULT_SETTINGS, MemodackSettingTab } from "setting-tab";
-
-const translation = new Translation();
+import { Free } from "free";
+import { Personal } from "personal";
+import { IServer } from "types";
 
 export default class MemodackPlugin extends Plugin {
   settings: ISettings;
@@ -22,6 +21,22 @@ export default class MemodackPlugin extends Plugin {
 
   async onload() {
     await this.loadSettings();
+
+    // Ping
+    // TODO: What about ping every minute!?
+    if (
+      this.settings.server === "personal" &&
+      this.settings?.url &&
+      this.settings?.xApiKey
+    ) {
+      const personal = new Personal(this.settings.url, this.settings.xApiKey);
+      const translation = await personal.getTranslation("en", "uk", "ping");
+
+      if (!translation || translation !== "пінг") {
+        this.settings.server = "free";
+        await this.loadSettings();
+      }
+    }
 
     addIcon(icon.id, icon.svg);
 
@@ -89,21 +104,43 @@ export default class MemodackPlugin extends Plugin {
         const selection = editor.getSelection();
 
         // Translate
-        const translate = await translation.translate(
-          this.settings.source,
-          this.settings.target,
-          selection
-        );
+        let translation: string | null = null;
 
-        if (!translate) {
+        // Temp
+        if (
+          this.settings.server === "personal" &&
+          this.settings?.url &&
+          this.settings?.xApiKey
+        ) {
+          const personal = new Personal(
+            this.settings.url,
+            this.settings.xApiKey
+          );
+
+          translation = await personal.getTranslation(
+            this.settings.source,
+            this.settings.target,
+            selection
+          );
+        } else {
+          const free = new Free();
+
+          translation = await free.getTranslation(
+            this.settings.source,
+            this.settings.target,
+            selection
+          );
+        }
+
+        if (!translation) {
           return;
         }
 
-        editor.replaceSelection(`{${selection}|${translate}}`);
+        editor.replaceSelection(`{${selection}|${translation}}`);
 
         // TTS (don't wait)
         this.play(this.settings.source, selection).then(() => {
-          this.play(this.settings.target, translate);
+          this.play(this.settings.target, translation);
         });
       },
     });
@@ -213,8 +250,21 @@ export default class MemodackPlugin extends Plugin {
 
   private async play(source: string, text: string) {
     const cache = new Cache(this.app.vault, this.manifest);
-    const tts = new Tts();
-    const player = new Player(tts, cache);
+
+    // Temp
+    let server: IServer;
+
+    if (
+      this.settings.server === "personal" &&
+      this.settings?.url &&
+      this.settings?.xApiKey
+    ) {
+      server = new Personal(this.settings.url, this.settings.xApiKey);
+    } else {
+      server = new Free();
+    }
+
+    const player = new Player(server, cache);
 
     await player.play(source, text);
   }

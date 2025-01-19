@@ -1,15 +1,15 @@
 import { Hash } from "hash";
 import { Cache } from "cache";
-import { Tts } from "tts";
+import { IServer } from "types";
 
 export class Player {
   private audio = new Audio();
   cache: Cache;
-  tts: Tts;
+  server: IServer;
 
-  constructor(tts: Tts, cache: Cache) {
+  constructor(server: IServer, cache: Cache) {
     this.cache = cache;
-    this.tts = tts;
+    this.server = server;
   }
 
   async play(source: string, text: string) {
@@ -22,7 +22,7 @@ export class Player {
     if (existAudioUrl) {
       audioUrl = existAudioUrl;
     } else {
-      audioUrl = await this.tts.getAudioUrl(source, text);
+      audioUrl = await this.server.getAudioUrl(source, text);
 
       if (!audioUrl) {
         return;
