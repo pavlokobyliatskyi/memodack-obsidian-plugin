@@ -43,24 +43,27 @@ export class Cache {
     }
   }
 
-  // TODO: Move to another place? (cache-manager)
   // Return size of cache directory
   async getCacheSize(): Promise<number> {
     try {
+      let totalSize = 0;
+
       // Check if cache directory exist
       if (!(await this.vault.adapter.exists(this.cacheDirectory))) {
         // And disable "Clear" button in settings
-        return 0;
+        return totalSize;
       }
 
-      const stat = await this.vault.adapter.stat(this.cacheDirectory);
+      const { files } = await this.vault.adapter.list(this.cacheDirectory);
 
-      if (!stat || !stat?.size) {
-        // And disable "Clear" button in settings
-        return 0;
+      for (const file of files) {
+        const fileStat = await this.vault.adapter.stat(file);
+        if (fileStat?.size) {
+          totalSize += fileStat.size;
+        }
       }
 
-      return stat.size;
+      return totalSize;
     } catch (e) {
       // And disable "Clear" button in settings
       return 0;
