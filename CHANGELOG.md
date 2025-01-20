@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0 (2025-01-20)
+
+### Added
+
+- Clear the cache button
+
 ## 1.2.0 (2025-01-20)
 
 ### Added
