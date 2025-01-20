@@ -276,4 +276,16 @@ export default class MemodackPlugin extends Plugin {
       }
     }
   }
+
+  // Temp
+  async clearCache() {
+    const cache = new Cache(this.app.vault, this.manifest);
+    await cache.clearCache();
+  }
+
+  // Temp
+  async getCacheSize() {
+    const cache = new Cache(this.app.vault, this.manifest);
+    return await cache.getCacheSize();
+  }
 }

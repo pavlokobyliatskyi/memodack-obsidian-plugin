@@ -42,4 +42,42 @@ export class Cache {
       return null;
     }
   }
+
+  // TODO: Move to another place? (cache-manager)
+  // Return size of cache directory
+  async getCacheSize(): Promise<number> {
+    try {
+      // Check if cache directory exist
+      if (!(await this.vault.adapter.exists(this.cacheDirectory))) {
+        // And disable "Clear" button in settings
+        return 0;
+      }
+
+      const stat = await this.vault.adapter.stat(this.cacheDirectory);
+
+      if (!stat || !stat?.size) {
+        // And disable "Clear" button in settings
+        return 0;
+      }
+
+      return stat.size;
+    } catch (e) {
+      // And disable "Clear" button in settings
+      return 0;
+    }
+  }
+
+  // Remove all files in cache directory
+  async clearCache(): Promise<void> {
+    try {
+      // Check if cache directory exist
+      if (!(await this.vault.adapter.exists(this.cacheDirectory))) {
+        return;
+      }
+
+      await this.vault.adapter.rmdir(this.cacheDirectory, true);
+    } catch (e) {
+      //
+    }
+  }
 }

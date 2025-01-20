@@ -3,6 +3,7 @@ import MemodackPlugin from "main";
 import { PluginSettingTab, App, Setting, Notice } from "obsidian";
 import { Ping } from "ping";
 import { TServer } from "types";
+import prettyBytes from "pretty-bytes";
 
 export interface ISettings {
   source: string;
@@ -26,7 +27,7 @@ export class MemodackSettingTab extends PluginSettingTab {
     this.plugin = plugin;
   }
 
-  display(): void {
+  async display(): Promise<void> {
     const { containerEl } = this;
 
     containerEl.empty();
@@ -124,6 +125,24 @@ export class MemodackSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
       });
+
+    containerEl.createEl("h2", { text: "Optimization" });
+
+    const cacheSize = await this.plugin.getCacheSize();
+
+    // Cache
+    const cacheSetting = new Setting(containerEl)
+      .setName("Cache")
+      .setDesc(prettyBytes(cacheSize))
+      .addButton((btn) =>
+        btn
+          .setButtonText("Clear")
+          .setCta()
+          .onClick(() => {
+            this.plugin.clearCache();
+            cacheSetting.setDesc(prettyBytes(0));
+          })
+      );
   }
 
   // Temp

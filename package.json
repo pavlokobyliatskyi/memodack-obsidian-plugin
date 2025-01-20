@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "google-tts-api": "^2.0.2",
+    "pretty-bytes": "^6.1.1",
     "translate": "^3.0.1"
   }
 }
