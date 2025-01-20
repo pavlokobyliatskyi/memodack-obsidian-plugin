@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.1 (2025-01-20)
+
+### Fixed
+
+- Cache size calculation
+
 ## 1.3.0 (2025-01-20)
 
 ### Added
