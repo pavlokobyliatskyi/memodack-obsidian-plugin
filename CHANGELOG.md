@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.0
+
+### Added
+
+- Voiceover speed
+
 ## 1.4.0 (2025-01-20)
 
 ### Added
