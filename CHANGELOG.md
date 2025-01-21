@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.0 (2025-01-20)
+
+### Added
+
+- Play on click
+
 ## 1.3.1 (2025-01-20)
 
 ### Fixed
