@@ -12,6 +12,7 @@ export interface ISettings {
   url?: string;
   xApiKey?: string;
   playOnClick: TPlayOnClick;
+  voiceoverSpeed: string;
 }
 
 export const DEFAULT_SETTINGS: Partial<ISettings> = {
@@ -19,6 +20,7 @@ export const DEFAULT_SETTINGS: Partial<ISettings> = {
   target: "uk",
   server: "free",
   playOnClick: "translation",
+  voiceoverSpeed: "1",
 };
 
 export class MemodackSettingTab extends PluginSettingTab {
@@ -130,6 +132,23 @@ export class MemodackSettingTab extends PluginSettingTab {
 
     // Options
     containerEl.createEl("h2", { text: "Options" });
+
+    new Setting(containerEl)
+      .setName("Voiceover Speed")
+      .setDesc("At what speed do you want to voice over?")
+      .addDropdown((dropdown) => {
+        dropdown
+          .addOptions({
+            "1": "Normal",
+            "2": "Faster",
+            "3": "Super Fast",
+          })
+          .setValue(this.plugin.settings.voiceoverSpeed)
+          .onChange(async (value) => {
+            this.plugin.settings.voiceoverSpeed = value;
+            await this.plugin.saveSettings();
+          });
+      });
 
     new Setting(containerEl)
       .setName("Play On Click")

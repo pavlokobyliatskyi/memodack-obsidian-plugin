@@ -186,6 +186,6 @@ export class MemodackPracticeModal extends Modal {
 
     const player = new Player(server, cache);
 
-    await player.play(source, text);
+    await player.play(source, text, Number(this.settings.voiceoverSpeed));
   }
 }

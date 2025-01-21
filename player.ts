@@ -12,7 +12,7 @@ export class Player {
     this.server = server;
   }
 
-  async play(source: string, text: string) {
+  async play(source: string, text: string, playbackRate = 1) {
     const key = await Hash.sha256(`${source}:${text}`);
 
     const existAudioUrl = await this.cache.get(key);
@@ -39,6 +39,9 @@ export class Player {
     this.audio.src = audioUrl;
     await this.audio.play();
     this.audio.volume = 1;
+
+    // Speed
+    this.audio.playbackRate = playbackRate;
 
     // Waiting for playback to finish
     await new Promise<void>((resolve) => {

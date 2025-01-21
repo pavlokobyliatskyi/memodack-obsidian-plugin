@@ -268,7 +268,7 @@ export default class MemodackPlugin extends Plugin {
 
     const player = new Player(server, cache);
 
-    await player.play(source, text);
+    await player.play(source, text, Number(this.settings.voiceoverSpeed));
   }
 
   // Temp
