@@ -2,7 +2,7 @@ import { languages } from "languages";
 import MemodackPlugin from "main";
 import { PluginSettingTab, App, Setting, Notice } from "obsidian";
 import { Ping } from "ping";
-import { TServer } from "types";
+import { TPlayOnClick, TServer } from "types";
 import prettyBytes from "pretty-bytes";
 
 export interface ISettings {
@@ -11,12 +11,14 @@ export interface ISettings {
   server: TServer;
   url?: string;
   xApiKey?: string;
+  playOnClick: TPlayOnClick;
 }
 
 export const DEFAULT_SETTINGS: Partial<ISettings> = {
   source: "en",
   target: "uk",
   server: "free",
+  playOnClick: "translation",
 };
 
 export class MemodackSettingTab extends PluginSettingTab {
@@ -122,6 +124,28 @@ export class MemodackSettingTab extends PluginSettingTab {
           .setValue(this.plugin.settings.source)
           .onChange(async (value) => {
             this.plugin.settings.source = value;
+            await this.plugin.saveSettings();
+          });
+      });
+
+    // Options
+    containerEl.createEl("h2", { text: "Options" });
+
+    new Setting(containerEl)
+      .setName("Play On Click")
+      .setDesc("What action should be taken when clicking on a word or phrase?")
+      .addDropdown((dropdown) => {
+        dropdown
+          .addOptions({
+            disable: "Disable",
+            value: "Value",
+            translation: "Translation",
+            "value-and-translation": "Value+Translation",
+            "translation-and-value": "Translation+Value",
+          })
+          .setValue(this.plugin.settings.playOnClick)
+          .onChange(async (value: TPlayOnClick) => {
+            this.plugin.settings.playOnClick = value;
             await this.plugin.saveSettings();
           });
       });

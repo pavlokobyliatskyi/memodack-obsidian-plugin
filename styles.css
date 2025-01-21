@@ -6,6 +6,11 @@
   background-color: #f4f4f4;
 }
 
+/* Temp */
+.hover {
+  cursor: pointer;
+}
+
 .blitz__answers {
   display: flex;
   gap: 4px;

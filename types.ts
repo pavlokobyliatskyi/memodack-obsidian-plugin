@@ -14,3 +14,10 @@ export interface IServer {
 }
 
 export type TServer = "free" | "personal";
+
+export type TPlayOnClick =
+  | "disable"
+  | "value"
+  | "translation"
+  | "value-and-translation"
+  | "translation-and-value";

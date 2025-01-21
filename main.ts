@@ -57,8 +57,15 @@ export default class MemodackPlugin extends Plugin {
           const match = part.match(/\{(.*?)\|(.*?)\}/);
 
           if (match) {
+            // TODO: Remove!?
+            const cls = ["syntax"];
+
+            if (this.settings.playOnClick !== "disable") {
+              cls.push("hover");
+            }
+
             const span = createEl("span", {
-              cls: "syntax",
+              cls,
               text: match[1],
               // Add translation
               attr: {
@@ -66,7 +73,11 @@ export default class MemodackPlugin extends Plugin {
               },
             });
 
-            // TODO: Play on click
+            // Temp
+            if (match[1] && match[2]) {
+              span.onClickEvent(() => this.playOnClick(match[1], match[2]));
+            }
+
             fragment.appendChild(span);
           } else {
             fragment.appendChild(document.createTextNode(part));
@@ -287,5 +298,45 @@ export default class MemodackPlugin extends Plugin {
   async getCacheSize() {
     const cache = new Cache(this.app.vault, this.manifest);
     return await cache.getCacheSize();
+  }
+
+  // Temp
+  async playOnClick(value: string, translation: string) {
+    if (this.settings.playOnClick === "disable") {
+      return;
+    }
+
+    switch (this.settings.playOnClick) {
+      case "value":
+        this.play(this.settings.source, value);
+        break;
+
+      case "translation":
+        this.play(this.settings.target, translation);
+        break;
+
+      case "value-and-translation":
+        this.play(this.settings.source, value).then(() => {
+          if (!translation) {
+            return;
+          }
+
+          this.play(this.settings.target, translation);
+        });
+        break;
+
+      case "translation-and-value":
+        this.play(this.settings.target, translation).then(() => {
+          if (!translation) {
+            return;
+          }
+
+          this.play(this.settings.source, value);
+        });
+        break;
+
+      default:
+        break;
+    }
   }
 }
