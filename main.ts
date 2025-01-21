@@ -145,6 +145,7 @@ export default class MemodackPlugin extends Plugin {
           this.play(this.settings.target, translation);
         });
       },
+      icon: "type",
     });
 
     // Add the icon in the left ribbon.
