@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.1
+
+### Added
+
+- Quick action icon for translate command
+
 ## 1.5.0
 
 ### Added
