@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.2
+
+### Changed
+
+- Ribbon Icon
+
 ## 1.5.1
 
 ### Added

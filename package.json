@@ -1,6 +1,6 @@
 {
   "name": "obsidian-memodack-plugin",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Memorizing words or phrases",
   "main": "main.js",
   "scripts": {
