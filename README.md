@@ -15,6 +15,13 @@ limitations.
 
 ![desktop](desktop.png)
 
+### Installation
+
+1. Launch Obsidian.
+2. Navigate to `Settings` > `Community Plugins`.
+3. Search for "Memodack".
+4. Install and enable the plugin.
+
 ### Syntax
 
 The plugin has its own syntax.
