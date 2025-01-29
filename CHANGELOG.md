@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Use API for translation and text-to-speech (TTS)
+
 ### Added
 
 - Created `src` directory
