@@ -1,15 +1,15 @@
 import { Cache } from "./cache";
 import { Hash } from "./hash";
-import { IServer } from "./types";
+import { TTS } from "./tts";
 
 export class Player {
   private audio = new Audio();
   cache: Cache;
-  server: IServer;
+  tts: TTS;
 
-  constructor(server: IServer, cache: Cache) {
+  constructor(tts: TTS, cache: Cache) {
     this.cache = cache;
-    this.server = server;
+    this.tts = tts;
   }
 
   async play(source: string, text: string, playbackRate = 1) {
@@ -22,7 +22,7 @@ export class Player {
     if (existAudioUrl) {
       audioUrl = existAudioUrl;
     } else {
-      audioUrl = await this.server.getAudioUrl(source, text);
+      audioUrl = await this.tts.tts(source, text);
 
       if (!audioUrl) {
         return;
@@ -36,7 +36,7 @@ export class Player {
     }
 
     this.audio.volume = 0;
-    this.audio.src = audioUrl;
+    this.audio.src = `data:audio/wav;base64,${audioUrl}`;
     await this.audio.play();
     this.audio.volume = 1;
 

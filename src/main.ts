@@ -2,12 +2,10 @@ import { DEFAULT_SETTINGS, ISettings, MemodackSettingTab } from "./setting-tab";
 import { Editor, MarkdownView, Notice, Plugin, addIcon } from "obsidian";
 
 import { Cache } from "./cache";
-import { Free } from "./free";
-import { IServer } from "./types";
 import { MemodackPracticeModal } from "./practice-modal";
-import { Personal } from "./personal";
-import { Ping } from "./ping";
 import { Player } from "./player";
+import { TTS } from "./tts";
+import { Translation } from "./translation";
 import { icon } from "./icon";
 
 export default class MemodackPlugin extends Plugin {
@@ -23,8 +21,6 @@ export default class MemodackPlugin extends Plugin {
 
   async onload() {
     await this.loadSettings();
-
-    await this.checkConnection();
 
     addIcon(icon.id, icon.svg);
 
@@ -58,10 +54,9 @@ export default class MemodackPlugin extends Plugin {
           const match = part.match(/\{(.*?)\|(.*?)\}/);
 
           if (match) {
-            // TODO: Remove!?
             const cls = ["syntax"];
 
-            if (this.settings.playOnClick !== "disable") {
+            if (this.settings.playOnClick !== "nothing") {
               cls.push("hover");
             }
 
@@ -74,7 +69,6 @@ export default class MemodackPlugin extends Plugin {
               },
             });
 
-            // Temp
             if (match[1] && match[2]) {
               span.onClickEvent(() => this.playOnClick(match[1], match[2]));
             }
@@ -98,52 +92,29 @@ export default class MemodackPlugin extends Plugin {
     this.addCommand({
       id: "translate",
       name: "Translate",
-      hotkeys: [], // Alt+T
       editorCallback: async (editor: Editor) => {
         const selection = editor.getSelection();
 
-        // Translate
-        let translation: string | null = null;
+        const translation = new Translation(this.settings.apiKey);
+        const translatedText = await translation.translate(
+          this.settings.source,
+          this.settings.target,
+          selection
+        );
 
-        // Temp
-        if (
-          this.settings.server === "personal" &&
-          this.settings?.url &&
-          this.settings?.xApiKey
-        ) {
-          const personal = new Personal(
-            this.settings.url,
-            this.settings.xApiKey
-          );
-
-          translation = await personal.getTranslation(
-            this.settings.source,
-            this.settings.target,
-            selection
-          );
-        } else {
-          const free = new Free();
-
-          translation = await free.getTranslation(
-            this.settings.source,
-            this.settings.target,
-            selection
-          );
-        }
-
-        if (!translation) {
+        if (!translatedText) {
           return;
         }
 
-        editor.replaceSelection(`{${selection}|${translation}}`);
+        editor.replaceSelection(`{${selection}|${translatedText}}`);
 
         // TTS (don't wait)
         this.play(this.settings.source, selection).then(() => {
-          if (!translation) {
+          if (!translatedText) {
             return;
           }
 
-          this.play(this.settings.target, translation);
+          this.play(this.settings.target, translatedText);
         });
       },
       icon: "type",
@@ -155,11 +126,10 @@ export default class MemodackPlugin extends Plugin {
         this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode() ===
         "preview";
 
-      // Temp
       const selection = this.app.workspace.activeEditor?.editor?.getSelection();
 
       if (!isReadingMode && selection) {
-        new Notice("Only in Reding Mode!");
+        new Notice("Only in Reading Mode!");
         return;
       }
 
@@ -248,63 +218,26 @@ export default class MemodackPlugin extends Plugin {
     return words;
   }
 
-  onunload() {
-    //
-  }
-
   private async play(source: string, text: string) {
     const cache = new Cache(this.app.vault, this.manifest);
-
-    // Temp
-    let server: IServer;
-
-    if (
-      this.settings.server === "personal" &&
-      this.settings?.url &&
-      this.settings?.xApiKey
-    ) {
-      server = new Personal(this.settings.url, this.settings.xApiKey);
-    } else {
-      server = new Free();
-    }
-
-    const player = new Player(server, cache);
+    const tts = new TTS(this.settings.apiKey);
+    const player = new Player(tts, cache);
 
     await player.play(source, text, Number(this.settings.voiceoverSpeed));
   }
 
-  // Temp
-  async checkConnection() {
-    if (
-      this.settings.server === "personal" &&
-      this.settings?.url &&
-      this.settings?.xApiKey
-    ) {
-      const ping = await Ping.ping(this.settings?.url, this.settings?.xApiKey);
-
-      // Switch to Free
-      if (!ping) {
-        this.settings.server = "free";
-        await this.loadSettings();
-      }
-    }
-  }
-
-  // Temp
   async clearCache() {
     const cache = new Cache(this.app.vault, this.manifest);
     await cache.clearCache();
   }
 
-  // Temp
   async getCacheSize() {
     const cache = new Cache(this.app.vault, this.manifest);
     return await cache.getCacheSize();
   }
 
-  // Temp
   async playOnClick(value: string, translation: string) {
-    if (this.settings.playOnClick === "disable") {
+    if (this.settings.playOnClick === "nothing") {
       return;
     }
 

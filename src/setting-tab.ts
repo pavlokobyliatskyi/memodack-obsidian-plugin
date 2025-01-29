@@ -1,25 +1,23 @@
 import { App, Notice, PluginSettingTab, Setting } from "obsidian";
-import { TPlayOnClick, TServer } from "./types";
 
 import MemodackPlugin from "./main";
-import { Ping } from "./ping";
+import { TPlayOnClick } from "./types";
+import { TTS } from "./tts";
+import { Translation } from "./translation";
 import { languages } from "./languages";
 import prettyBytes from "pretty-bytes";
 
 export interface ISettings {
   source: string;
   target: string;
-  server: TServer;
-  url?: string;
-  xApiKey?: string;
   playOnClick: TPlayOnClick;
   voiceoverSpeed: string;
+  apiKey: string;
 }
 
 export const DEFAULT_SETTINGS: Partial<ISettings> = {
   source: "en",
   target: "uk",
-  server: "free",
   playOnClick: "translation",
   voiceoverSpeed: "1",
 };
@@ -37,77 +35,38 @@ export class MemodackSettingTab extends PluginSettingTab {
 
     containerEl.empty();
 
-    containerEl.createEl("h2", { text: "Server" });
+    new Setting(containerEl).setName("Provider (Google)").setHeading();
 
     new Setting(containerEl)
-      .setName("Type")
-      .setDesc("Choose the server type")
-      .addDropdown((dropdown) => {
-        dropdown
-          .addOptions({
-            free: "Free",
-            personal: "Personal",
-          })
-          .setValue(this.plugin.settings.server)
-          .onChange(async (value: TServer) => {
-            this.plugin.settings.server = value;
+      .setName("API Key")
+      .setDesc("API key for translation and text-to-speech services.")
+      .addText((text) =>
+        text
+          .setValue(this.plugin.settings?.apiKey || "")
+          .onChange(async (value) => {
+            this.plugin.settings.apiKey = value;
             await this.plugin.saveSettings();
+          })
+          .inputEl.setAttribute("type", "password")
+      );
 
-            // Temp
-            this.display();
-          });
-      });
+    new Setting(containerEl)
+      .setName("Connection")
+      .setDesc("Check access to services by API key.")
+      .addButton((btn) =>
+        btn
+          .setButtonText("Check")
+          .setCta()
+          .onClick(() => {
+            this.check();
+          })
+      );
 
-    // Personal
-    if (this.plugin.settings.server === "personal") {
-      new Setting(containerEl)
-        .setName("URL")
-        .setDesc("This is the URL of the server API")
-        .addText((text) =>
-          text
-            .setPlaceholder(
-              "https://u6r709mlz0.execute-api.eu-central-1.amazonaws.com"
-            )
-            .setValue(this.plugin.settings?.url || "")
-            .onChange(async (value) => {
-              this.plugin.settings.url = value;
-              await this.plugin.saveSettings();
-            })
-        );
-
-      new Setting(containerEl)
-        .setName("X API Key")
-        .setDesc("This credential grants access to the server")
-        .addText((text) =>
-          text
-            .setPlaceholder("x-api-key found in the server file")
-            .setValue(this.plugin.settings?.xApiKey || "")
-            .onChange(async (value) => {
-              value = value.replace(/\/$/, ""); // remove a trailing slash ("/");
-              this.plugin.settings.xApiKey = value;
-              await this.plugin.saveSettings();
-            })
-            .inputEl.setAttribute("type", "password")
-        );
-
-      new Setting(containerEl)
-        .setName("Connection")
-        .setDesc("Verify the connection to the server")
-        .addButton((btn) =>
-          btn
-            .setButtonText("Check")
-            .setCta()
-            .onClick(() => {
-              this.checkConnection();
-            })
-        );
-    }
-
-    containerEl.createEl("h2", { text: "Language" });
+    new Setting(containerEl).setName("Language").setHeading();
 
     new Setting(containerEl)
       .setName("Native")
-      .setDesc("This is the language you speak natively")
+      .setDesc("This is the language you speak natively.")
       .addDropdown((dropdown) => {
         dropdown
           .addOptions(languages)
@@ -120,7 +79,7 @@ export class MemodackSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Document")
-      .setDesc("This is the language of the document")
+      .setDesc("This is the language of the document.")
       .addDropdown((dropdown) => {
         dropdown
           .addOptions(languages)
@@ -131,18 +90,18 @@ export class MemodackSettingTab extends PluginSettingTab {
           });
       });
 
-    // Options
-    containerEl.createEl("h2", { text: "Options" });
+    new Setting(containerEl).setName("Voiceover").setHeading();
 
     new Setting(containerEl)
-      .setName("Voiceover Speed")
-      .setDesc("At what speed do you want to voice over?")
+      .setName("Playback speed")
+      .setDesc("The speed at which the voiceover will be performed.")
       .addDropdown((dropdown) => {
         dropdown
+          // It's the same approach as YouTube.
           .addOptions({
             "1": "Normal",
-            "2": "Faster",
-            "3": "Super Fast",
+            "2": "x2",
+            "3": "x3",
           })
           .setValue(this.plugin.settings.voiceoverSpeed)
           .onChange(async (value) => {
@@ -151,17 +110,19 @@ export class MemodackSettingTab extends PluginSettingTab {
           });
       });
 
+    new Setting(containerEl).setName("Actions").setHeading();
+
     new Setting(containerEl)
-      .setName("Play On Click")
-      .setDesc("What action should be taken when clicking on a word or phrase?")
+      .setName("When pressed play")
+      .setDesc("Will be voiced when you click on a word or phrase.")
       .addDropdown((dropdown) => {
         dropdown
           .addOptions({
-            disable: "Disable",
+            nothing: "Nothing",
             value: "Value",
             translation: "Translation",
-            "value-and-translation": "Value+Translation",
-            "translation-and-value": "Translation+Value",
+            "value-and-translation": "Value + Translation",
+            "translation-and-value": "Translation + Value",
           })
           .setValue(this.plugin.settings.playOnClick)
           .onChange(async (value: TPlayOnClick) => {
@@ -170,14 +131,13 @@ export class MemodackSettingTab extends PluginSettingTab {
           });
       });
 
-    containerEl.createEl("h2", { text: "Optimization" });
+    new Setting(containerEl).setName("Optimization").setHeading();
 
     const cacheSize = await this.plugin.getCacheSize();
 
-    // Cache
     const cacheSetting = new Setting(containerEl)
       .setName("Cache")
-      .setDesc(prettyBytes(cacheSize))
+      .setDesc(`${prettyBytes(cacheSize)}.`)
       .addButton((btn) =>
         btn
           .setButtonText("Clear")
@@ -189,23 +149,49 @@ export class MemodackSettingTab extends PluginSettingTab {
       );
   }
 
-  // Temp
-  private async checkConnection() {
-    if (
-      this.plugin.settings.server === "personal" &&
-      this.plugin.settings?.url &&
-      this.plugin.settings?.xApiKey
-    ) {
-      const ping = await Ping.ping(
-        this.plugin.settings?.url,
-        this.plugin.settings?.xApiKey
-      );
+  private async check() {
+    const apiKey = this.plugin.settings?.apiKey;
 
-      if (ping) {
-        new Notice("Success Connection!");
-      } else {
-        new Notice("Failed Connection!");
+    if (!apiKey) {
+      new Notice("Fill in the field to enter the API key.");
+      return;
+    }
+
+    this.checkTranslation(apiKey);
+    this.checkTTS(apiKey);
+  }
+
+  private async checkTranslation(apiKey: string) {
+    try {
+      // Translation
+      const translation = new Translation(apiKey);
+      const translatatedText = await translation.translate("en", "uk", "ping");
+
+      if (translatatedText !== "пінг") {
+        new Notice("The translation service is not working.");
+        return;
       }
+
+      new Notice("The translation service is working.");
+    } catch (e) {
+      new Notice("The translation service is not working.");
+    }
+  }
+
+  private async checkTTS(apiKey: string) {
+    try {
+      // TTS
+      const tts = new TTS(apiKey);
+      const base64 = await tts.tts("en", "ping");
+
+      if (!base64) {
+        new Notice("The text-to-speech service is not working.");
+        return;
+      }
+
+      new Notice("The text-to-speech service is working.");
+    } catch (e) {
+      new Notice("The text-to-speech service is not working.");
     }
   }
 }

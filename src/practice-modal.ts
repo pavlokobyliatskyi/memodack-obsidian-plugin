@@ -1,11 +1,9 @@
 import { App, Modal, PluginManifest } from "obsidian";
 
 import { Cache } from "./cache";
-import { Free } from "./free";
-import { IServer } from "./types";
 import { ISettings } from "./setting-tab";
-import { Personal } from "./personal";
 import { Player } from "./player";
+import { TTS } from "./tts";
 import { getRandomNumbers } from "./numbers";
 import { shuffle } from "./shuffle";
 
@@ -91,7 +89,6 @@ export class MemodackPracticeModal extends Modal {
     let nextButtonEl: HTMLButtonElement | undefined = undefined;
     let correctOptionEl: HTMLButtonElement | undefined = undefined;
 
-    // TODO: Fix?
     const answersButtons: HTMLButtonElement[] = [];
 
     blitz.answers.forEach((option, index) => {
@@ -120,7 +117,7 @@ export class MemodackPracticeModal extends Modal {
           optionEl.addClass("wrong");
           correctOptionEl?.addClass("correct");
 
-          // TODO: Fix? Push to the end for try again
+          // Push to the end for try again
           const blitzTranslation = blitz.answers[blitz.correctId];
 
           const shuffleAnswers = shuffle(blitz.answers);
@@ -171,21 +168,8 @@ export class MemodackPracticeModal extends Modal {
 
   private async play(source: string, text: string) {
     const cache = new Cache(this.app.vault, this.manifest);
-
-    // Temp
-    let server: IServer;
-
-    if (
-      this.settings.server === "personal" &&
-      this.settings?.url &&
-      this.settings?.xApiKey
-    ) {
-      server = new Personal(this.settings.url, this.settings.xApiKey);
-    } else {
-      server = new Free();
-    }
-
-    const player = new Player(server, cache);
+    const tts = new TTS(this.settings.apiKey);
+    const player = new Player(tts, cache);
 
     await player.play(source, text, Number(this.settings.voiceoverSpeed));
   }
