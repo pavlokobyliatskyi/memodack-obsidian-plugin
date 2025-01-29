@@ -1,127 +1,133 @@
 # Changelog
 
-## 1.6.0 (2025-01-29)
+## [1.6.1] - 2025-01-29
 
-### Changed
+### Features
 
-- Use API for translation and text-to-speech (TTS)
+- Enforced standard voice for Google TTS by setting `ssmlGender: "NEUTRAL"`
 
-### Added
+## [1.6.0] - 2025-01-29
+
+### Features
 
 - Created `src` directory
 
-### Removed
+### Bug Fixes
+
+- Use API for translation and text-to-speech (TTS)
+
+### Breaking Changes
 
 - Removed the server
 
-## 1.5.2 (2025-01-22)
+## [1.5.2] - 2025-01-22
 
-### Changed
+### Bug Fixes
 
-- Ribbon Icon
+- Updated Ribbon Icon
 
-## 1.5.1 (2025-01-21)
+## [1.5.1] - 2025-01-21
 
-### Added
+### Features
 
 - Quick action icon for translate command
 
-## 1.5.0 (2025-01-21)
+## [1.5.0] - 2025-01-21
 
-### Added
+### Features
 
 - Voiceover speed
 
-## 1.4.0 (2025-01-20)
+## [1.4.0] - 2025-01-20
 
-### Added
+### Features
 
 - Play on click
 
-## 1.3.1 (2025-01-20)
+## [1.3.1] - 2025-01-20
 
-### Fixed
+### Bug Fixes
 
 - Cache size calculation
 
-## 1.3.0 (2025-01-20)
+## [1.3.0] - 2025-01-20
 
-### Added
+### Features
 
 - Clear the cache button
 
-## 1.2.0 (2025-01-20)
+## [1.2.0] - 2025-01-20
 
-### Added
+### Features
 
 - Connection check for the server
 
-## 1.1.0 (2025-01-19)
+## [1.1.0] - 2025-01-19
 
-### Added
+### Features
 
-- Added the server and the Lambda function
+- Added server and Lambda function
 
-## 1.0.1 (2025-01-18)
+## [1.0.1] - 2025-01-18
 
-### Fixed
+### Bug Fixes
 
 - Transform text to syntax format
 
-## 1.0.0 (2025-01-18)
+## [1.0.0] - 2025-01-18
 
-### Changed
-
-- Updated the syntax `{value|translation}`
-
-### Fixed
+### Bug Fixes
 
 - Getting words for practice
 
-## 0.2.0 (2025-01-17)
+### Breaking Changes
 
-### Added
+- Updated the syntax `{value|translation}`
+
+## [0.2.0] - 2025-01-17
+
+### Features
 
 - Practice by selecting
 
-### Fixed
+### Bug Fixes
 
 - Remove default hotkeys
 
-## 0.1.4 (2025-01-17)
+## [0.1.4] - 2025-01-17
 
-### Changed
+### Bug Fixes
 
 - Updated the description
 
-## 0.1.3 (2025-01-16)
+## [0.1.3] - 2025-01-16
 
-### Fixed
+### Bug Fixes
 
 - Preserve line breaks in Reading mode
 
-### Changed
+### Refactor
 
 - Back to repository name of version `0.1.1`.
 
-## 0.1.2 (2025-01-15)
+## [0.1.2] - 2025-01-15
 
-### Fixed
+### Bug Fixes
 
 - Cache directory path
 - Removed the use of `innerHTML`
 - Used default hotkeys
 - Disable answers button after selecting an option
 
-## 0.1.1 (2025-01-15)
+## [0.1.1] - 2025-01-15
 
-### Changed
+### Refactor
 
-- Renamed
+- Renamed repository
 
-## 0.1.0 (2025-01-15)
+## [0.1.0] - 2025-01-15
 
-### Added
+### Features
 
 - Translate selected word/phrase
 - Syntax (only in reading mode)
