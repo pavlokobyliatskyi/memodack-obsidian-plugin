@@ -2,9 +2,13 @@
 
 ## [Unreleased]
 
+### Added
+
+- Created `src` directory
+
 ### Removed
 
-- Server
+- Removed the server
 
 ## 1.5.2
 

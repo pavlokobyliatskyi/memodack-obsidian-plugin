@@ -1,12 +1,13 @@
-import { getRandomNumbers } from "numbers";
-import { Modal, App, PluginManifest } from "obsidian";
-import { Player } from "player";
-import { ISettings } from "setting-tab";
-import { shuffle } from "shuffle";
-import { Cache } from "cache";
-import { IServer } from "types";
-import { Personal } from "personal";
-import { Free } from "free";
+import { App, Modal, PluginManifest } from "obsidian";
+
+import { Cache } from "./cache";
+import { Free } from "./free";
+import { IServer } from "./types";
+import { ISettings } from "./setting-tab";
+import { Personal } from "./personal";
+import { Player } from "./player";
+import { getRandomNumbers } from "./numbers";
+import { shuffle } from "./shuffle";
 
 export class MemodackPracticeModal extends Modal {
   settings: ISettings;

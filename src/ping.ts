@@ -1,4 +1,4 @@
-import { Personal } from "personal";
+import { Personal } from "./personal";
 
 export class Ping {
   static async ping(url: string, xApiKey: string): Promise<boolean> {

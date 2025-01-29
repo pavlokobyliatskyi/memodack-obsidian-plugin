@@ -1,5 +1,5 @@
+import { IServer } from "./types";
 import { requestUrl } from "obsidian";
-import { IServer } from "types";
 
 export class Personal implements IServer {
   url: string;

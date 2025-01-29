@@ -1,13 +1,14 @@
-import { Cache } from "cache";
-import { icon } from "icon";
-import { Player } from "player";
-import { addIcon, Editor, MarkdownView, Notice, Plugin } from "obsidian";
-import { MemodackPracticeModal } from "practice-modal";
-import { ISettings, DEFAULT_SETTINGS, MemodackSettingTab } from "setting-tab";
-import { Free } from "free";
-import { Personal } from "personal";
-import { IServer } from "types";
-import { Ping } from "ping";
+import { DEFAULT_SETTINGS, ISettings, MemodackSettingTab } from "./setting-tab";
+import { Editor, MarkdownView, Notice, Plugin, addIcon } from "obsidian";
+
+import { Cache } from "./cache";
+import { Free } from "./free";
+import { IServer } from "./types";
+import { MemodackPracticeModal } from "./practice-modal";
+import { Personal } from "./personal";
+import { Ping } from "./ping";
+import { Player } from "./player";
+import { icon } from "./icon";
 
 export default class MemodackPlugin extends Plugin {
   settings: ISettings;

@@ -1,8 +1,9 @@
-import { languages } from "languages";
-import MemodackPlugin from "main";
-import { PluginSettingTab, App, Setting, Notice } from "obsidian";
-import { Ping } from "ping";
-import { TPlayOnClick, TServer } from "types";
+import { App, Notice, PluginSettingTab, Setting } from "obsidian";
+import { TPlayOnClick, TServer } from "./types";
+
+import MemodackPlugin from "./main";
+import { Ping } from "./ping";
+import { languages } from "./languages";
 import prettyBytes from "pretty-bytes";
 
 export interface ISettings {

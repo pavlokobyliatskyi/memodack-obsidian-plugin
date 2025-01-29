@@ -1,7 +1,8 @@
-import { IServer } from "types";
-import translate from "translate";
 import * as googleTtsApi from "google-tts-api";
+
+import { IServer } from "./types";
 import { requestUrl } from "obsidian";
+import translate from "translate";
 
 const arrayBufferToBase64 = async (arrayBuffer: ArrayBuffer) => {
   const binaryString = String.fromCharCode(...new Uint8Array(arrayBuffer));

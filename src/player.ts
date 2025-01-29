@@ -1,6 +1,6 @@
-import { Hash } from "hash";
-import { Cache } from "cache";
-import { IServer } from "types";
+import { Cache } from "./cache";
+import { Hash } from "./hash";
+import { IServer } from "./types";
 
 export class Player {
   private audio = new Audio();
