@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## 1.6.0 (2025-01-29)
 
 ### Changed
 
@@ -14,19 +14,19 @@
 
 - Removed the server
 
-## 1.5.2
+## 1.5.2 (2025-01-22)
 
 ### Changed
 
 - Ribbon Icon
 
-## 1.5.1
+## 1.5.1 (2025-01-21)
 
 ### Added
 
 - Quick action icon for translate command
 
-## 1.5.0
+## 1.5.0 (2025-01-21)
 
 ### Added
 
