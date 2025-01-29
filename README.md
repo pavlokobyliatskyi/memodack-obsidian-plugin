@@ -52,7 +52,7 @@ If you don't want to practice all the words in the document, just enable Reading
 
 ### Settings
 
-In the settings, you can select languages and chose the [Server](server/README.md), etc.
+In the settings, you can select languages and etc.
 
 ![settings](settings.gif)
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Removed
+
+- Server
+
 ## 1.5.2
 
 ### Changed

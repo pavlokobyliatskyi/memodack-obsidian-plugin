@@ -1,2 +1,0 @@
-deep-translator==1.11.4
-gTTS==2.5.4
