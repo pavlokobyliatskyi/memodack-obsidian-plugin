@@ -15,6 +15,7 @@ export class TTS {
         input: { text: text },
         voice: {
           languageCode: source,
+          ssmlGender: "NEUTRAL",
         },
         audioConfig: { audioEncoding: "MP3" },
       };
